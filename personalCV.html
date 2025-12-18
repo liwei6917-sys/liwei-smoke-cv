@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>李維｜粉毛香菸品鑑師 CV</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(255, 160, 160, 0.08), transparent 55%),
+        radial-gradient(circle at 80% 120%, rgba(255, 120, 180, 0.06), transparent 60%),
+        linear-gradient(120deg, #0b0d14, #141824 45%, #1a1019 90%);
+      color: #f9f4ea;
+      line-height: 1.7;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ===== 整體煙霧層（動態霧化） ===== */
+    .fog-layer {
+      position: fixed;
+      inset: -40vh;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      opacity: 0.18;
+      z-index: 0;
+    }
+
+    .fog {
+      position: absolute;
+      width: 90vw;
+      height: 90vh;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.25), transparent 60%),
+        radial-gradient(circle at 80% 60%, rgba(255, 190, 220, 0.22), transparent 60%);
+      filter: blur(20px);
+      animation: fogMove1 40s linear infinite;
+    }
+
+    .fog.fog-2 {
+      top: -10vh;
+      left: -20vw;
+      opacity: 0.7;
+      animation: fogMove2 55s linear infinite;
+    }
+
+    .fog.fog-3 {
+      top: 20vh;
+      right: -30vw;
+      opacity: 0.5;
+      animation: fogMove3 65s linear infinite;
+    }
+
+    @keyframes fogMove1 {
+      0%   { transform: translate3d(-10vw, 0, 0); }
+      50%  { transform: translate3d(10vw, -5vh, 0); }
+      100% { transform: translate3d(-10vw, 0, 0); }
+    }
+
+    @keyframes fogMove2 {
+      0%   { transform: translate3d(15vw, 5vh, 0); }
+      50%  { transform: translate3d(-5vw, -5vh, 0); }
+      100% { transform: translate3d(15vw, 5vh, 0); }
+    }
+
+    @keyframes fogMove3 {
+      0%   { transform: translate3d(0, 0, 0); }
+      50%  { transform: translate3d(-15vw, 8vh, 0); }
+      100% { transform: translate3d(0, 0, 0); }
+    }
+
+    /* ===== 漂浮煙絲微粒 ===== */
+    .dust-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
+      mix-blend-mode: screen;
+    }
+
+    .dust {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: rgba(255, 226, 210, 0.7);
+      box-shadow: 0 0 8px rgba(255, 200, 185, 0.9);
+      opacity: 0;
+      animation: dustFloat 18s linear infinite;
+    }
+
+    @keyframes dustFloat {
+      0% {
+        transform: translate3d(0, 0, 0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.5;
+      }
+      60% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translate3d(0, -120vh, 0);
+        opacity: 0;
+      }
+    }
+
+    /* ===== 主要卡片 ===== */
+    .page {
+      max-width: 1000px;
+      width: 100%;
+      border-radius: 24px;
+      background: rgba(11, 13, 22, 0.9);
+      border: 1px solid rgba(255, 230, 205, 0.14);
+      box-shadow:
+        0 0 60px rgba(0, 0, 0, 0.9),
+        0 0 80px rgba(255, 158, 195, 0.22);
+      position: relative;
+      z-index: 2;
+      overflow: hidden;
+      padding: 26px;
+    }
+
+    .page::before {
+      content: "";
+      position: absolute;
+      inset: -40px;
+      background:
+        radial-gradient(circle at 0 20%, rgba(255, 200, 190, 0.2), transparent 55%),
+        radial-gradient(circle at 100% 80%, rgba(255, 170, 220, 0.18), transparent 55%);
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .page-inner {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 270px 1fr;
+      gap: 30px;
+    }
+
+    /* ===== 左側：頭像與基本資訊 ===== */
+    .sidebar {
+      padding: 20px 18px;
+      border-radius: 18px;
+      background: radial-gradient(circle at 0 0, rgba(255, 192, 203, 0.14), #111422);
+      box-shadow: 0 0 0 1px rgba(255, 230, 210, 0.1);
+    }
+
+    /* 新增：兩張頭像左右並排 */
+    .avatar-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: nowrap;
+    }
+
+    .avatar-wrap {
+      text-align: center;
+      position: relative;
+    }
+
+    .avatar-wrap::before {
+      /* 頭像周圍淡煙霧暈染 */
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255, 187, 210, 0.4), transparent 55%),
+        radial-gradient(circle at 0 100%, rgba(255, 233, 210, 0.25), transparent 60%);
+      filter: blur(12px);
+      opacity: 0.7;
+      z-index: -1;
+    }
+
+    .avatar {
+      width: 150px;
+      height: 150px;
+      border-radius: 26px;
+      object-fit: cover;
+      filter: saturate(1.1) contrast(1.02);
+      box-shadow:
+        0 0 0 2px rgba(255, 176, 197, 0.92),
+        0 0 20px rgba(255, 150, 190, 0.9),
+        0 14px 28px rgba(0, 0, 0, 0.85);
+    }
+
+    .name {
+      text-align: center;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      margin-top: 10px;
+      margin-bottom: 4px;
+    }
+
+    .nickname-tag {
+      display: inline-block;
+      margin: 0 auto 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      letter-spacing: 2px;
+      border: 1px solid rgba(255, 158, 188, 0.9);
+      color: #ffc8e0;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: #ded8ff;
+      opacity: 0.9;
+      margin-bottom: 18px;
+    }
+
+    .section-title {
+      font-size: 15px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #ffddaa;
+      margin: 22px 0 8px;
+      position: relative;
+    }
+
+    .section-title::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -4px;
+      width: 42px;
+      height: 2px;
+      background: linear-gradient(90deg, #ffafbd, transparent);
+      border-radius: 999px;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .tag {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid rgba(255, 243, 219, 0.25);
+      background: radial-gradient(circle at 0 0, rgba(255, 188, 160, 0.3), rgba(10, 10, 20, 0.9));
+      color: rgba(255, 249, 241, 0.9);
+    }
+
+    .contact-box {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(6, 10, 20, 0.97);
+      font-size: 13px;
+      border: 1px dashed rgba(255, 230, 200, 0.3);
+      color: rgba(255, 249, 240, 0.88);
+    }
+
+    .contact-box a {
+      color: #ffd2b2;
+      text-decoration: none;
+    }
+
+    .contact-box a:hover {
+      text-decoration: underline;
+    }
+
+    /* ===== 右側內容 ===== */
+    .main {
+      padding: 8px 6px;
+    }
+
+    .headline {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #ffeedd;
+    }
+
+    .about {
+      font-size: 14px;
+      color: rgba(252, 246, 235, 0.9);
+      margin-bottom: 16px;
+    }
+
+    /* 港風按鈕列 */
+    .nav-buttons {
+      margin: 6px 0 20px;
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .hk-btn {
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      letter-spacing: 2px;
+      background: linear-gradient(160deg, #1a1d28, #090a10);
+      border: 1px solid rgba(255, 110, 150, 0.35);
+      color: #ffd7e5;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-shadow: 0 0 6px rgba(255, 150, 180, 0.35);
+      filter: brightness(1.05);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hk-btn:hover {
+      box-shadow:
+        0 0 6px rgba(255, 140, 190, 0.6),
+        0 0 16px rgba(255, 150, 200, 0.45),
+        inset 0 0 14px rgba(255, 120, 180, 0.18);
+      transform: translateY(-2px);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .pill {
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 174, 188, 0.5);
+      background: rgba(19, 16, 29, 0.95);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: rgba(255, 246, 239, 0.9);
+    }
+
+    .pill-bullet {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffd2b2, #ff7b9c);
+    }
+
+    .section-block {
+      padding: 14px 14px 16px;
+      border-radius: 16px;
+      background: radial-gradient(circle at 0 0, rgba(255, 224, 196, 0.16), rgba(9, 12, 22, 0.98));
+      border: 1px solid rgba(255, 224, 196, 0.22);
+      margin-bottom: 16px;
+      font-size: 14px;
+      color: rgba(252, 246, 235, 0.92);
+    }
+
+    .section-block h3 {
+      font-size: 15px;
+      margin-bottom: 6px;
+      letter-spacing: 2px;
+      color: #ffe2c0;
+    }
+
+    .section-block small {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 18px;
+      margin-top: 6px;
+      font-size: 14px;
+    }
+
+    .timeline-item {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: radial-gradient(circle at 0 0, rgba(255, 224, 196, 0.14), rgba(9, 12, 22, 0.98));
+      border: 1px solid rgba(255, 224, 196, 0.2);
+      position: relative;
+    }
+
+    .timeline-year {
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #ffdfb8;
+      margin-bottom: 2px;
+    }
+
+    .timeline-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .timeline-note {
+      font-size: 13px;
+      color: rgba(242, 233, 218, 0.92);
+    }
+
+    .timeline-item::before {
+      content: "◆";
+      position: absolute;
+      left: -12px;
+      top: 14px;
+      font-size: 10px;
+      color: #ffafc0;
+      text-shadow: 0 0 8px rgba(255, 153, 187, 0.8);
+    }
+
+    .footer {
+      margin-top: 26px;
+      font-size: 12px;
+      color: rgba(255, 243, 219, 0.7);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .footer strong {
+      color: #ffd1b3;
+      font-weight: 600;
+    }
+
+    /* ===== RWD ===== */
+    @media (max-width: 900px) {
+      body {
+        align-items: flex-start;
+        padding: 12px;
+      }
+
+      .page {
+        padding: 20px;
+      }
+
+      .page-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        order: -1;
+      }
+
+      .avatar {
+        width: 140px;
+        height: 140px;
+      }
+
+      .avatar-row {
+        gap: 8px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page {
+        padding: 16px;
+      }
+
+      .name {
+        font-size: 22px;
+      }
+
+      .nav-buttons {
+        gap: 8px;
+      }
+
+      .hk-btn {
+        padding: 6px 10px;
+        font-size: 11px;
+      }
+
+      .avatar-row {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 動態霧化背景 -->
+  <div class="fog-layer">
+    <div class="fog fog-1"></div>
+    <div class="fog fog-2"></div>
+    <div class="fog fog-3"></div>
+  </div>
+
+  <!-- 漂浮煙絲微粒 -->
+  <div class="dust-container" id="dustContainer"></div>
+
+  <!-- 主要內容卡片（一頁式） -->
+  <div class="page">
+    <div class="page-inner">
+      <!-- 左邊：個人基本資訊 -->
+      <aside class="sidebar">
+        <!-- 兩張照片左右排 -->
+        <div class="avatar-row">
+          <div class="avatar-wrap">
+            <img src="https://image2url.com/images/1766061775259-eee6b424-c9e6-42dc-8019-a39fcdf3263c.jpg"
+                 alt="李維 個人照片"
+                 class="avatar" />
+          </div>
+          <div class="avatar-wrap">
+            <img src="https://image2url.com/images/1766061906431-01569aaa-a7ec-4a1c-96db-1118a657c118.jpg"
+                 alt="AKA 靜宜人工系品菸家"
+                 class="avatar" />
+          </div>
+        </div>
+
+        <div class="name">李維</div>
+        <div class="nickname-tag">粉毛香菸品鑑師</div>
+        <div class="subtitle">資訊傳播工程學系｜學生</div>
+
+        <h3 class="section-title">興趣 & 專長</h3>
+        <div class="tag-list">
+          <span class="tag">香菸風味品鑑</span>
+          <span class="tag">音樂品鑑</span>
+          <span class="tag">釀酒 & 調酒</span>
+          <span class="tag">哲學思考</span>
+          <span class="tag">心理學觀察</span>
+        </div>
+
+        <h3 class="section-title">聯絡方式</h3>
+        <div class="contact-box">
+          Email：<a href="mailto:liwei06170617@gmail.com">liwei06170617@gmail.com</a><br />
+          Line：<strong>Liwei0617</strong><br />
+          IG：<strong>@eeweiewe</strong>
+        </div>
+      </aside>
+
+      <!-- 右邊：一頁式各區塊 -->
+      <main class="main">
+        <!-- 港風導覽按鈕列（一頁式錨點） -->
+        <nav class="nav-buttons">
+          <a href="#home" class="hk-btn">首頁</a>
+          <a href="#flavor" class="hk-btn">香菸 / 釀酒</a>
+          <a href="#music" class="hk-btn">音樂品鑑</a>
+          <a href="#philosophy" class="hk-btn">哲學心理</a>
+          <a href="#contact" class="hk-btn">聯絡我</a>
+        </nav>
+
+        <!-- 首頁 / About -->
+        <section id="home">
+          <div class="headline">關於我</div>
+          <p class="about">
+            我喜歡在昏黃燈光下，一手香菸、一手酒杯，耳機裡放著還沒被大眾聽膩的歌，
+            把所有味道、旋律跟情緒記錄下來。對我來說，這些都是理解世界與理解自己的方式。
+          </p>
+          <p class="about">
+            目前就讀資訊相關科系，會把程式、設計和這些感官興趣混在一起玩：
+            可能是一個小小的風味紀錄系統，也可能是一場帶點煙霧感的活動視覺。
+            希望未來能在科技、藝術與人性之間找到平衡，把理性和感性串在同一條時間軸上。
+          </p>
+
+          <div class="headline">個人標籤</div>
+          <div class="pill-row">
+            <div class="pill">
+              <span class="pill-bullet"></span> 復古港風氛圍控
+            </div>
+            <div class="pill">
+              <span class="pill-bullet"></span> 香菸口感紀錄者
+            </div>
+            <div class="pill">
+              <span class="pill-bullet"></span> 聽歌拆解情緒的人
+            </div>
+            <div class="pill">
+              <span class="pill-bullet"></span> 用哲學與心理學看關係
+            </div>
+          </div>
+        </section>
+
+        <!-- 香菸 / 釀酒區塊 -->
+        <section id="flavor">
+          <div class="headline">品嚐香菸 & 釀酒</div>
+
+          <div class="section-block">
+            <h3>香菸風味筆記</h3>
+            <small>Flavor Notes of Smoke</small>
+            <p>
+              我習慣把每一根香菸當成一杯咖啡在記錄：入口的刺激度、煙體的厚度、
+              尾韻是偏堅果、木質還是微甜。點燃之前，我會先聞乾菸的味道；
+              吐煙時，觀察煙霧在空氣裡散開的速度與形狀。
+            </p>
+            <p>
+              這些感受會被寫進自己的風味表，用「早晨、深夜、放鬆、焦慮、靈感強度」等狀態作標籤，
+              讓同一個牌子的菸在不同情緒下有不同的註解。
+            </p>
+          </div>
+
+          <div class="section-block">
+            <h3>釀酒 / 調酒實驗</h3>
+            <small>Liquor & Mood Pairing</small>
+            <p>
+              相較於一次喝很多，我更喜歡慢慢試比例。用簡單的基酒配果香、花香或苦味利口酒，
+              找出最適合當天心情的平衡點。有時候是適合寫作的微醺，
+              有時候是適合聽歌發呆的長飲。
+            </p>
+            <p>
+              我也會嘗試記錄「這杯酒搭配哪一支香菸、哪一首歌最適合」，
+              讓味覺、嗅覺與聽覺連成一個完整的場景。
+            </p>
+          </div>
+        </section>
+
+        <!-- 音樂品鑑區塊 -->
+        <section id="music">
+          <div class="headline">音樂品鑑</div>
+
+          <div class="section-block">
+            <h3>從旋律到情緒的拆解</h3>
+            <small>Listening, Not Just Hearing</small>
+            <p>
+              聽歌的時候，我不只記得歌名，更在意「這首歌適合什麼情境」。
+              低頻的厚度、鼓點的速度、人聲的距離感，
+              都會影響它是適合通勤、走夜路還是待在房間點菸放空。
+            </p>
+            <p>
+              我會把歌單分成「夜晚思考用」、「寫程式用」、「失眠專用」等類型，
+              有時候也會替朋友客製歌單，依照他的狀態幫他配一段聲音旅程。
+            </p>
+          </div>
+
+          <div class="section-block">
+            <h3>聲音與記憶</h3>
+            <small>Music as a Diary</small>
+            <p>
+              有些旋律會跟特定時間點綁在一起：某一根菸、某一段對話、某一次失眠。
+              於是歌變成了一種「時間書籤」，只要重播，
+              當時的情緒就會被喚醒，提醒我那時候的自己在想什麼。
+            </p>
+          </div>
+        </section>
+
+        <!-- 哲學 & 心理學區塊 -->
+        <section id="philosophy">
+          <div class="headline">思考哲學 & 心理學</div>
+
+          <div class="section-block">
+            <h3>用哲學拆解日常</h3>
+            <small>Philosophy of Everyday Life</small>
+            <p>
+              我習慣用哲學問題來拆解生活中的不安——
+              例如「我到底在追求什麼？」、「這個選擇是自由還是慣性？」。
+              讀尼采或叔本華時，不會只停留在名言，而是把概念丟回自己的日常，
+              看看哪些行為其實是被恐懼或慣性控制。
+            </p>
+          </div>
+
+          <div class="section-block">
+            <h3>心理學視角：觀察自己與關係</h3>
+            <small>Self Observation</small>
+            <p>
+              心理學對我來說是一面鏡子。  
+              我會記錄自己在關係中的反應：焦慮、依賴、逃避、想得到肯定，
+              然後對照依附理論或人格特質，試著找出「我為什麼會這樣想」。
+            </p>
+            <p>
+              這些筆記不只是理論，而是給未來的我看的備忘錄——
+              告訴自己，在情緒把我推走之前，先停下來看清楚它長什麼樣子。
+            </p>
+          </div>
+        </section>
+
+        <!-- 聯絡我 -->
+        <section id="contact">
+          <div class="headline">聯絡我</div>
+
+          <div class="section-block">
+            <h3>合作 / 聊天 / 交換想法</h3>
+            <p>
+              如果你也對香菸風味、音樂、釀酒、哲學或心理學有興趣，
+              歡迎找我聊天或一起做點實驗性的企劃。  
+              不管是報告、活動、視覺設計，還是單純想找人分享心情，都可以。
+            </p>
+            <p>
+              Email：<a href="mailto:liwei06170617@gmail.com">liwei06170617@gmail.com</a><br />
+              Line：<strong>Liwei0617</strong><br />
+              IG：<strong>@eeweiewe</strong>
+            </p>
+          </div>
+        </section>
+
+        <div class="footer">
+          <span>風格關鍵字：<strong>復古港風 · 菸霧感 · 霓虹微光</strong></span>
+          <span>One-page portfolio of 李維</span>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- JS：產生煙絲微粒 -->
+  <script>
+    const dustContainer = document.getElementById("dustContainer");
+
+    function createDustParticle() {
+      const dust = document.createElement("span");
+      dust.classList.add("dust");
+
+      const startLeft = Math.random() * 100; // vw
+      const delay = Math.random() * 18;      // s
+      const scale = 0.6 + Math.random() * 0.9;
+
+      dust.style.left = startLeft + "vw";
+      dust.style.bottom = "-10vh";
+      dust.style.transform = `scale(${scale})`;
+      dust.style.animationDelay = delay + "s";
+
+      dustContainer.appendChild(dust);
+    }
+
+    // 生成多顆煙絲微粒
+    for (let i = 0; i < 40; i++) {
+      createDustParticle();
+    }
+  </script>
+</body>
+</html>
